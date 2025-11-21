@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Родительский POM-проект, который предоставляет стандартные настройки для Spring Boot проектов -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.0</version>
+        <relativePath/> <!-- указывает, что родительский POM-файл должен быть найден в репозитории, а не в локальной файловой системе -->
+    </parent>
+
+    <!--change artefact id-->
+    <!-- Координаты проекта -->
+    <groupId>io.hohichh.marketplace</groupId>
+    <artifactId>template</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging> <!-- Упаковка проекта в JAR-файл -->
+
+    <!--change name-->
+    <!-- Информация о проекте -->
+    <name>service-template</name>
+    <description>user management app</description>
+
+    <!--    change project name!!!-->
+    <!-- Свойства проекта -->
+    <properties>
+        <java.version>22</java.version> <!-- Версия Java, используемая в проекте -->
+        <!-- Настройки для SonarQube - платформы для анализа качества кода -->
+        <sonar.organization>marketplace-internship-project</sonar.organization>
+        <sonar.projectKey>Marketplace-internship-project_service-template</sonar.projectKey>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.reporting.outputDirectory}/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version> <!-- Версия MapStruct -->
+<!--        Исключение директорий для анализа sonar-->
+        <sonar.coverage.exclusions>
+            **/dto/**,
+            **/model/**,
+            **/exception/**,
+            **/config/**,
+            **/mapper/**,
+            **/security/**,
+            **/*Application.java
+        </sonar.coverage.exclusions>
+    </properties>
+
+    <!-- Зависимости проекта -->
+    <dependencies>
+
+        <!-- Основные зависимости Spring Boot для создания веб-приложений -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId> <!-- Стартер для создания веб-приложений с использованием Spring MVC. Включает встроенный Tomcat. -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId> <!-- Добавляет конечные точки для мониторинга и управления приложением (например, /health, /metrics). -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId> <!-- Стартер для использования валидации бинов (JSR-380). -->
+        </dependency>
+
+        <!-- Зависимости для работы с базой данных -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId> <!-- Стартер для работы с JPA (Java Persistence API), включая Hibernate. -->
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId> <!-- JDBC-драйвер для подключения к базе данных PostgreSQL. -->
+            <scope>runtime</scope> <!-- Зависимость необходима только во время выполнения. -->
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId> <!-- Инструмент для управления миграциями схемы базы данных. -->
+        </dependency>
+
+        <!-- Зависимости для кэширования -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId> <!-- Стартер для поддержки кэширования в Spring. -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId> <!-- Стартер для интеграции с Redis, используемого в качестве хранилища кэша. -->
+        </dependency>
+
+        <!-- Утилиты для разработки -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId> <!-- Библиотека, которая позволяет сократить написание шаблонного кода (геттеры, сеттеры, конструкторы и т.д.) с помощью аннотаций. -->
+            <optional>true</optional> <!-- Зависимость не является транзитивной. -->
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId> <!-- Фреймворк для генерации кода для маппинга (преобразования) Java-бинов. -->
+            <version>${org.mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId> <!-- Процессор аннотаций для MapStruct, который генерирует реализацию мапперов во время компиляции. -->
+            <version>${org.mapstruct.version}</version>
+            <scope>provided</scope> <!-- Зависимость необходима только на этапе компиляции. -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId> <!-- Процессор аннотаций для генерации метаданных для кастомных properties в application.properties/yml, что обеспечивает автодополнение в IDE. -->
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId> <!-- Инструменты для разработки, которые обеспечивают автоматический перезапуск приложения при изменениях кода. -->
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Зависимости для тестирования -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId> <!-- Основной стартер для тестирования Spring Boot приложений. Включает JUnit, Mockito и другие полезные библиотеки. -->
+            <scope>test</scope> <!-- Зависимость используется только для тестирования. -->
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId> <!-- Встраиваемая база данных in-memory, удобная для тестов. -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId> <!-- Простая реализация SLF4J для логирования в тестах. -->
+            <version>2.0.7</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Зависимости для интеграционного тестирования с Testcontainers -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId> <!-- Интеграция Testcontainers со Spring Boot. -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId> <!-- Библиотека для запуска Docker-контейнеров из Java-кода, полезная для интеграционных тестов с реальными зависимостями. -->
+            <version>1.19.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId> <!-- Интеграция Testcontainers с JUnit 5. -->
+            <version>1.19.8</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId> <!-- Модуль Testcontainers для запуска контейнеров с PostgreSQL. -->
+            <version>1.19.8</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+
+    <!-- Секция сборки проекта -->
+    <build>
+        <plugins>
+            <!-- Плагин для запуска юнит-тестов -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <!-- Аргумент для JVM при запуске тестов, необходимый для работы некоторых библиотек с рефлексией в новых версиях Java. -->
+                    <argLine>${argLine} --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                </configuration>
+            </plugin>
+
+            <!-- Плагин для сборки исполняемого JAR-файла Spring Boot -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!-- Исключает Lombok из конечного JAR-файла, так как он нужен только на этапе компиляции. -->
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Плагин для запуска интеграционных тестов -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal> <!-- Запускает интеграционные тесты. -->
+                            <goal>verify</goal> <!-- Проверяет результаты интеграционных тестов. -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Плагин для интеграции с SonarQube -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>5.0.0.4389</version>
+            </plugin>
+
+            <!-- Плагин для компиляции Java-кода -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- Настройка процессоров аннотаций для MapStruct и Lombok, чтобы они работали вместе. -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <!-- Аргумент компилятора, который указывает MapStruct генерировать Spring-компоненты для мапперов. -->
+                    <compilerArgs>
+                        <compilerArg>-Amapstruct.defaultComponentModel=spring</compilerArg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- Плагин для сбора информации о покрытии кода тестами -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <!-- Подготавливает JaCoCo агент для сбора данных о покрытии во время выполнения тестов. -->
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase> <!-- Фаза жизненного цикла Maven, на которой генерируется отчет. -->
+                        <goals>
+                            <!-- Генерирует отчет о покрытии кода тестами. -->
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

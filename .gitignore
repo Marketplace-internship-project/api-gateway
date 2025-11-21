@@ -1,0 +1,50 @@
+# Результаты сборки Maven
+/target/
+
+# Специальное правило, чтобы НЕ игнорировать Maven Wrapper
+# Он нужен, чтобы другие могли собрать проект без установки Maven
+!.mvn/wrapper/maven-wrapper.jar
+
+# Лог-файлы
+*.log
+*.log.*
+
+# Локальные файлы конфигурации и секреты
+# Никогда не коммитьте файлы с паролями и токенами!
+*.env
+application-local.properties
+application-local.yml
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Системные файлы ОС ###
+# macOS
+.DS_Store
+# Windows
+Thumbs.db
+
+.env
