@@ -14,14 +14,14 @@
     <!--change artefact id-->
     <!-- Координаты проекта -->
     <groupId>io.hohichh.marketplace</groupId>
-    <artifactId>template</artifactId>
+    <artifactId>gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging> <!-- Упаковка проекта в JAR-файл -->
 
     <!--change name-->
     <!-- Информация о проекте -->
-    <name>service-template</name>
-    <description>user management app</description>
+    <name>api-gateway</name>
+    <description>gateway service</description>
 
     <!--    change project name!!!-->
     <!-- Свойства проекта -->
@@ -29,7 +29,7 @@
         <java.version>22</java.version> <!-- Версия Java, используемая в проекте -->
         <!-- Настройки для SonarQube - платформы для анализа качества кода -->
         <sonar.organization>marketplace-internship-project</sonar.organization>
-        <sonar.projectKey>Marketplace-internship-project_service-template</sonar.projectKey>
+        <sonar.projectKey>Marketplace-internship-project_api-gateway</sonar.projectKey>
         <sonar.coverage.jacoco.xmlReportPaths>
             ${project.reporting.outputDirectory}/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
