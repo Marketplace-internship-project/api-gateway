@@ -1,4 +1,4 @@
-package io.hohichh.marketplace.appname;
+package io.hohichh.marketplace.gateway;
 
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;

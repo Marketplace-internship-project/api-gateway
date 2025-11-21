@@ -1,4 +1,4 @@
-package io.hohichh.marketplace.appname.integration;
+package io.hohichh.marketplace.gateway.integration;
 
 
 import org.junit.jupiter.api.Test;
