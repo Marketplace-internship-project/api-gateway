@@ -52,10 +52,6 @@
         <!-- Основные зависимости Spring Boot для создания веб-приложений -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId> <!-- Стартер для создания веб-приложений с использованием Spring MVC. Включает встроенный Tomcat. -->
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId> <!-- Добавляет конечные точки для мониторинга и управления приложением (например, /health, /metrics). -->
         </dependency>
         <dependency>

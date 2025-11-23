@@ -7,12 +7,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,24 +30,31 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 @Slf4j
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter implements WebFilter {
     private final JwtValidator jwtValidator;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
-        String token = extractToken(request);
-        if (token != null && jwtValidator.validate(token)) {
-            Claims claims = jwtValidator.getClaims(token);
-            String userId = claims.getSubject();
-            String role = claims.get("role", String.class);
+    public Mono<Void> filter(ServerWebExchange exchange,
+                                WebFilterChain chain){
 
-            Authentication auth = getAuthentication(role, userId);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        String token = extractToken(exchange.getRequest());
+
+        if (token != null && jwtValidator.validate(token)) {
+            try{
+                Claims claims = jwtValidator.getClaims(token);
+                String userId = claims.getSubject();
+                String role = claims.get("role", String.class);
+
+                Authentication auth = getAuthentication(role, userId);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+
+                return chain.filter(exchange)
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+            } catch (Exception e){
+                log.error("Cannot set user authentication: {}", e.getMessage());
+            }
         }
-        filterChain.doFilter(request, response);
+        return chain.filter(exchange);
     }
 
     private Authentication getAuthentication(String role, String userId) {
@@ -57,8 +71,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authorities);
     }
 
-    private String extractToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
+    private String extractToken(ServerHttpRequest request) {
+        String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
