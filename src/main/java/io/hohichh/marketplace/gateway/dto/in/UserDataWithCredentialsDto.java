@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record UserDataWithCredentials(
+public record UserDataWithCredentialsDto(
         @NotBlank
         @Size(max = 255)
         String name,

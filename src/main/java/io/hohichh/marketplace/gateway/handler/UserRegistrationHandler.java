@@ -1,10 +1,150 @@
 package io.hohichh.marketplace.gateway.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.hohichh.marketplace.gateway.dto.in.NewUserDto;
+import io.hohichh.marketplace.gateway.dto.in.UserCredentialsCreateDto;
+import io.hohichh.marketplace.gateway.dto.in.UserDataWithCredentialsDto;
+import io.hohichh.marketplace.gateway.dto.out.UserDto;
+import io.hohichh.marketplace.gateway.exception.ActionNotPermittedException;
+import io.hohichh.marketplace.gateway.exception.GlobalExceptionHandler;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class UserRegistrationHandler {
-    public Object handle(){
-        return null;
+    private final WebClient userServiceWebClient;
+    private final WebClient authServiceWebClient;
+    private final ObjectMapper objectMapper;
+
+    public Mono<Void> handle(ServerWebExchange exchange){
+        return DataBufferUtils.join(exchange.getRequest().getBody())
+                .flatMap(dataBuffer -> {
+                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                    dataBuffer.read(bytes);
+                    DataBufferUtils.release(dataBuffer);
+
+                    try{
+                        String bodyStr = new String(bytes, StandardCharsets.UTF_8);
+                        UserDataWithCredentialsDto inDto = objectMapper.readValue(
+                                bodyStr, UserDataWithCredentialsDto.class);
+                        return processRegistration(inDto, exchange);
+                    } catch (JsonProcessingException e) {
+                        return Mono.error(new ActionNotPermittedException("Invalid JSON format"));
+                    }
+                }).onErrorResume(e -> handleErrors(exchange, e));
+    }
+
+    private Mono<Void> processRegistration(UserDataWithCredentialsDto fullDto,
+                                           ServerWebExchange exchange){
+        NewUserDto newUserDto = new NewUserDto(
+                fullDto.name(),
+                fullDto.surname(),
+                fullDto.birthDate(),
+                fullDto.email()
+        );
+
+        return userServiceWebClient.post()
+                .uri("/api/v1/users")
+                .bodyValue(newUserDto)
+                .retrieve()
+                .bodyToMono(UserDto.class)
+                .flatMap(createdUser -> {
+                    log.info("User created in User-Service with ID: {}", createdUser.id());
+
+                    UserCredentialsCreateDto credentials = new UserCredentialsCreateDto(
+                            createdUser.id(),
+                            fullDto.login(),
+                            fullDto.password()
+                    );
+
+                    return authServiceWebClient.post()
+                            .uri("/api/v1/auth/credentials")
+                            .bodyValue(credentials)
+                            .retrieve()
+                            .toBodilessEntity()
+                            .then(writeResponse(exchange, createdUser))
+                            .onErrorResume(e -> {
+                                log.error("Failed to create credentials in Auth-Service. Rolling back user creation for ID: {}", createdUser.id());
+                                return rollBackUserCreation(createdUser.id())
+                                        .then(Mono.error(e));
+                            });
+                });
+    }
+
+    private Mono<Void> rollBackUserCreation(UUID userId){
+        return userServiceWebClient.delete()
+                .uri("api/v1/users/" + userId)
+                .retrieve()
+                .toBodilessEntity()
+                .doOnSuccess(v -> log.info("Rollback successful: User {} deleted", userId))
+                .doOnError(e -> log.error("CRITICAL: Rollback failed for user {}." +
+                        " Manual intervention required!", userId))
+                .then();
+    }
+
+    private Mono<Void> writeResponse(ServerWebExchange exchange, UserDto userDto){
+        exchange.getResponse().setStatusCode(HttpStatus.CREATED);
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        try {
+            byte[] bytes = objectMapper.writeValueAsBytes(userDto);
+            DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+            return exchange.getResponse().writeWith(Mono.just(buffer));
+        } catch (JsonProcessingException e) {
+            return Mono.error(new RuntimeException("Error writing response"));
+        }
+    }
+
+    private Mono<Void> handleErrors(ServerWebExchange exchange, Throwable e){
+        log.error("Registration error: {}", e.getMessage());
+
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String mes = e.getMessage();
+
+        if(e instanceof WebClientResponseException wcre){
+            status = (HttpStatus) wcre.getStatusCode();
+            String responseBody = wcre.getResponseBodyAsString();
+
+            if (responseBody != null && !responseBody.isBlank()) {
+                try {
+                    GlobalExceptionHandler.ErrorResponse serviceError =
+                            objectMapper.readValue(responseBody, GlobalExceptionHandler.ErrorResponse.class);
+                    mes = serviceError.message();
+                } catch (Exception parseEx) {
+                    mes = wcre.getStatusText();
+                }
+            }
+        } else if(e instanceof ActionNotPermittedException){
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        exchange.getResponse().setStatusCode(status);
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+        GlobalExceptionHandler.ErrorResponse errorResponse =
+                new GlobalExceptionHandler.ErrorResponse(mes);
+        try {
+            byte[] bytes = objectMapper.writeValueAsBytes(errorResponse);
+            DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+            return exchange.getResponse().writeWith(Mono.just(buffer));
+        } catch (JsonProcessingException jsonEx) {
+            log.error("Error writing error response", jsonEx);
+            return exchange.getResponse().setComplete();
+        }
     }
 }
