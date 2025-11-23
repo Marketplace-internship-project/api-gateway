@@ -1,0 +1,54 @@
+package io.hohichh.marketplace.gateway.config;
+
+import io.hohichh.marketplace.gateway.handler.UserRegistrationHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+
+
+@Configuration
+@RequiredArgsConstructor
+public class GatewayRoutesConfig {
+    private final ServiceUrlsConfig urlConfig;
+    private final UserRegistrationHandler register;
+
+    @Bean
+    public RouteLocator routes(RouteLocatorBuilder builder) {
+        return builder.routes()
+                //authentication proxy (login, refresh token)
+                .route("auth-proxy", r -> r
+                        .path("/api/v1/auth/login", "/api/v1/auth/refresh")
+                        .and().method(HttpMethod.POST)
+                        .uri(urlConfig.getAuth())
+                )
+
+                //registration required saving of user data and receiving user_id from user-service
+                //and saving user_id and credentials in auth-service
+                .route("user-registration-handler", r -> r
+                        .path("/api/v1/auth/credentials")
+                        .and().method(HttpMethod.POST)
+                        .filters(f -> f.filter((exchange, chain) -> register.handle(exchange)))//todo add registration handler
+                        .uri("no://op")
+                )
+
+                //user-service proxy
+                //for all crud operations except user creation
+                .route("user-proxy", r -> r
+                        .path("/api/v1/users/**",
+                                "/api/v1/cards/**")
+                        .uri(urlConfig.getUser())
+                )
+
+                //order-service proxy
+                .route("order-proxy", r -> r
+                        .path("/api/v1/products/**",
+                                "/api/v1/orders/**")
+                        .uri(urlConfig.getOrder())
+                )
+
+                .build();
+    }
+}
