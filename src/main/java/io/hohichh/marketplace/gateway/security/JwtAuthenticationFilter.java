@@ -1,10 +1,6 @@
 package io.hohichh.marketplace.gateway.security;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -13,9 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -26,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//todo сделать правильную реализацию под webflux
 @Component
 @AllArgsConstructor
 @Slf4j
@@ -46,8 +39,6 @@ public class JwtAuthenticationFilter implements WebFilter {
                 String role = claims.get("role", String.class);
 
                 Authentication auth = getAuthentication(role, userId);
-                SecurityContextHolder.getContext().setAuthentication(auth);
-
                 return chain.filter(exchange)
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
             } catch (Exception e){

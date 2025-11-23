@@ -22,9 +22,6 @@ public record UserDataWithCredentialsDto(
         @Size(max = 255)
         String email,
 
-        @NotNull
-        UUID userId,
-
         @NotBlank
         String login,
 

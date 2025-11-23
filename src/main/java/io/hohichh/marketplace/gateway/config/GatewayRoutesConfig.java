@@ -30,7 +30,7 @@ public class GatewayRoutesConfig {
                 .route("user-registration-handler", r -> r
                         .path("/api/v1/auth/credentials")
                         .and().method(HttpMethod.POST)
-                        .filters(f -> f.filter((exchange, chain) -> register.handle(exchange)))//todo add registration handler
+                        .filters(f -> f.filter((exchange, chain) -> register.handle(exchange)))
                         .uri("no://op")
                 )
 
