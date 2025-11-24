@@ -44,7 +44,7 @@ public class UserRegistrationHandler {
                                 bodyStr, UserDataWithCredentialsDto.class);
                         return processRegistration(inDto, exchange);
                     } catch (JsonProcessingException e) {
-                        return Mono.error(new ActionNotPermittedException("Invalid JSON format"));
+                        return Mono.error(new ActionNotPermittedException("Invalid JSON format: " + e.getMessage()));
                     }
                 }).onErrorResume(e -> handleErrors(exchange, e));
     }
