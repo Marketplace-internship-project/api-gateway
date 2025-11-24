@@ -1,5 +1,6 @@
 package io.hohichh.marketplace.gateway.config;
 
+import io.hohichh.marketplace.gateway.handler.UserDeletionHandler;
 import io.hohichh.marketplace.gateway.handler.UserRegistrationHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -7,6 +8,7 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 
 @Configuration
@@ -14,6 +16,7 @@ import org.springframework.http.HttpMethod;
 public class GatewayRoutesConfig {
     private final ServiceUrlsConfig urlConfig;
     private final UserRegistrationHandler register;
+    private final UserDeletionHandler deletion;
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
@@ -31,6 +34,13 @@ public class GatewayRoutesConfig {
                         .path("/api/v1/auth/credentials")
                         .and().method(HttpMethod.POST)
                         .filters(f -> f.filter((exchange, chain) -> register.handle(exchange)))
+                        .uri("no://op")
+                )
+
+                .route("user-delete-handler", r -> r
+                        .path("/api/v1/users/{id}")
+                        .and().method(HttpMethod.DELETE)
+                        .filters(f -> f.filter((exchange, chain) -> deletion.handle(exchange)))
                         .uri("no://op")
                 )
 
