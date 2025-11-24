@@ -21,11 +21,21 @@ public class GatewayRoutesConfig {
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
-                //authentication proxy (login, refresh token)
-                .route("auth-proxy", r -> r
-                        .path("/api/v1/auth/login", "/api/v1/auth/refresh")
-                        .and().method(HttpMethod.POST)
+                //docs swagger ui
+                .route("auth-docs", r -> r
+                        .path("/v3/api-docs/auth")
+                        .filters(f -> f.rewritePath("/v3/api-docs/auth", "/api/v3/api-docs"))
                         .uri(urlConfig.getAuth())
+                )
+                .route("user-docs", r -> r
+                        .path("/v3/api-docs/user")
+                        .filters(f -> f.rewritePath("/v3/api-docs/user", "/api/v3/api-docs"))
+                        .uri(urlConfig.getUser())
+                )
+                .route("order-docs", r -> r
+                        .path("/v3/api-docs/order")
+                        .filters(f -> f.rewritePath("/v3/api-docs/order", "/api/v3/api-docs"))
+                        .uri(urlConfig.getOrder())
                 )
 
                 //registration required saving of user data and receiving user_id from user-service
@@ -42,6 +52,13 @@ public class GatewayRoutesConfig {
                         .and().method(HttpMethod.DELETE)
                         .filters(f -> f.filter((exchange, chain) -> deletion.handle(exchange)))
                         .uri("no://op")
+                )
+
+                //authentication proxy (login, refresh token)
+                .route("auth-proxy", r -> r
+                        .path("/api/v1/auth/login", "/api/v1/auth/refresh")
+                        .and().method(HttpMethod.POST)
+                        .uri(urlConfig.getAuth())
                 )
 
                 //user-service proxy

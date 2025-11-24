@@ -88,7 +88,7 @@ public class UserRegistrationHandler {
 
     private Mono<Void> rollBackUserCreation(UUID userId){
         return userServiceWebClient.delete()
-                .uri("api/v1/users/" + userId)
+                .uri("/api/v1/users/" + userId)
                 .retrieve()
                 .toBodilessEntity()
                 .doOnSuccess(v -> log.info("Rollback successful: User {} deleted", userId))
