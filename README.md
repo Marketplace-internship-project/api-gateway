@@ -16,3 +16,8 @@ cd api-gateway
 chmod +x setup.sh
 ./setup.sh
 ```
+
+#### 3. Swagger ui Docs are available at:
+```
+http://localhost:8080/swagger-ui.html
+```
