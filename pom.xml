@@ -48,12 +48,12 @@
 
     <!-- Зависимости проекта -->
     <dependencies>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId> <version>2.8.0</version>
+        </dependency>
 
         <!-- Основные зависимости Spring Boot для создания веб-приложений -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId> <!-- Стартер для создания веб-приложений с использованием Spring MVC. Включает встроенный Tomcat. -->
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId> <!-- Добавляет конечные точки для мониторинга и управления приложением (например, /health, /metrics). -->
@@ -63,30 +63,27 @@
             <artifactId>spring-boot-starter-validation</artifactId> <!-- Стартер для использования валидации бинов (JSR-380). -->
         </dependency>
 
-        <!-- Зависимости для работы с базой данных -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId> <!-- Стартер для работы с JPA (Java Persistence API), включая Hibernate. -->
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId> <!-- JDBC-драйвер для подключения к базе данных PostgreSQL. -->
-            <scope>runtime</scope> <!-- Зависимость необходима только во время выполнения. -->
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.5</version> </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.5</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId> <!-- Инструмент для управления миграциями схемы базы данных. -->
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.5</version>
+            <scope>runtime</scope>
         </dependency>
 
-        <!-- Зависимости для кэширования -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId> <!-- Стартер для поддержки кэширования в Spring. -->
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId> <!-- Стартер для интеграции с Redis, используемого в качестве хранилища кэша. -->
-        </dependency>
 
         <!-- Утилиты для разработки -->
         <dependency>
@@ -94,17 +91,7 @@
             <artifactId>lombok</artifactId> <!-- Библиотека, которая позволяет сократить написание шаблонного кода (геттеры, сеттеры, конструкторы и т.д.) с помощью аннотаций. -->
             <optional>true</optional> <!-- Зависимость не является транзитивной. -->
         </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId> <!-- Фреймворк для генерации кода для маппинга (преобразования) Java-бинов. -->
-            <version>${org.mapstruct.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId> <!-- Процессор аннотаций для MapStruct, который генерирует реализацию мапперов во время компиляции. -->
-            <version>${org.mapstruct.version}</version>
-            <scope>provided</scope> <!-- Зависимость необходима только на этапе компиляции. -->
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId> <!-- Процессор аннотаций для генерации метаданных для кастомных properties в application.properties/yml, что обеспечивает автодополнение в IDE. -->
@@ -124,44 +111,52 @@
             <scope>test</scope> <!-- Зависимость используется только для тестирования. -->
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId> <!-- Встраиваемая база данных in-memory, удобная для тестов. -->
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId> <!-- Простая реализация SLF4J для логирования в тестах. -->
             <version>2.0.7</version>
             <scope>test</scope>
         </dependency>
 
-        <!-- Зависимости для интеграционного тестирования с Testcontainers -->
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>4.12.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-testcontainers</artifactId> <!-- Интеграция Testcontainers со Spring Boot. -->
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers</artifactId> <!-- Библиотека для запуска Docker-контейнеров из Java-кода, полезная для интеграционных тестов с реальными зависимостями. -->
-            <version>1.19.8</version>
-            <scope>test</scope>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId> <!-- Интеграция Testcontainers с JUnit 5. -->
-            <version>1.19.8</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId> <!-- Модуль Testcontainers для запуска контейнеров с PostgreSQL. -->
-            <version>1.19.8</version>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>2025.0.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <!-- Секция сборки проекта -->
     <build>
@@ -223,25 +218,11 @@
                     <!-- Настройка процессоров аннотаций для MapStruct и Lombok, чтобы они работали вместе. -->
                     <annotationProcessorPaths>
                         <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${org.mapstruct.version}</version>
-                        </path>
-                        <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok-mapstruct-binding</artifactId>
-                            <version>0.2.0</version>
-                        </path>
                     </annotationProcessorPaths>
-                    <!-- Аргумент компилятора, который указывает MapStruct генерировать Spring-компоненты для мапперов. -->
-                    <compilerArgs>
-                        <compilerArg>-Amapstruct.defaultComponentModel=spring</compilerArg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
 
