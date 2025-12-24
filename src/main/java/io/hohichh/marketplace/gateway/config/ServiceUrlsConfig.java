@@ -11,4 +11,5 @@ public class ServiceUrlsConfig {
     private String auth;
     private String user;
     private String order;
+    private String payment;
 }

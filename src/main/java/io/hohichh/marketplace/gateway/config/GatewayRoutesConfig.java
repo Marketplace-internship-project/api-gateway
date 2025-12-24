@@ -76,6 +76,11 @@ public class GatewayRoutesConfig {
                         .uri(urlConfig.getOrder())
                 )
 
+                .route("payment-proxy", r -> r
+                        .path("/api/v1/payments/**")
+                        .uri(urlConfig.getPayment()) 
+                )
+
                 .build();
     }
 }
