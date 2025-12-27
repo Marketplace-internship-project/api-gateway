@@ -54,6 +54,7 @@ class GatewayRoutingTest {
         registry.add("app.services.auth", () -> mockUrl);
         registry.add("app.services.user", () -> mockUrl);
         registry.add("app.services.order", () -> mockUrl);
+        registry.add("app.services.payment", () -> mockUrl);
 
         registry.add("jwt.access.secret", () -> "mySuperSecretKeyForTestingPurposesOnly12345");
     }
