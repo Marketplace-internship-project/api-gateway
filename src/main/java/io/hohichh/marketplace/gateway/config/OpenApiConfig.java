@@ -23,6 +23,7 @@ import java.util.Map;
 @Configuration
 public class OpenApiConfig {
 
+    @SuppressWarnings("rawtypes")
     @Bean
     public OpenAPI customOpenAPI() {
         Map<String, Schema> schemas = ModelConverters.getInstance()
