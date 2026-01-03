@@ -18,23 +18,25 @@ public class GatewayRoutesConfig {
     private final UserRegistrationHandler register;
     private final UserDeletionHandler deletion;
 
+    private static final String SWAGGER_PATH = "/api/v3/api-docs";
+
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 //docs swagger ui
                 .route("auth-docs", r -> r
                         .path("/v3/api-docs/auth")
-                        .filters(f -> f.rewritePath("/v3/api-docs/auth", "/api/v3/api-docs"))
+                        .filters(f -> f.rewritePath("/v3/api-docs/auth", SWAGGER_PATH))
                         .uri(urlConfig.getAuth())
                 )
                 .route("user-docs", r -> r
                         .path("/v3/api-docs/user")
-                        .filters(f -> f.rewritePath("/v3/api-docs/user", "/api/v3/api-docs"))
+                        .filters(f -> f.rewritePath("/v3/api-docs/user", SWAGGER_PATH))
                         .uri(urlConfig.getUser())
                 )
                 .route("order-docs", r -> r
                         .path("/v3/api-docs/order")
-                        .filters(f -> f.rewritePath("/v3/api-docs/order", "/api/v3/api-docs"))
+                        .filters(f -> f.rewritePath("/v3/api-docs/order", SWAGGER_PATH))
                         .uri(urlConfig.getOrder())
                 )
 

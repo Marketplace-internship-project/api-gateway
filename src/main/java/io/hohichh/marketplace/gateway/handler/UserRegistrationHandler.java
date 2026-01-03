@@ -104,7 +104,7 @@ public class UserRegistrationHandler extends UserBaseHandler{
             byte[] bytes = objectMapper.writeValueAsBytes(userDto);
             DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
             return exchange.getResponse().writeWith(Mono.just(buffer));
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException _) {
             return Mono.error(new RuntimeException("Error writing response"));
         }
     }

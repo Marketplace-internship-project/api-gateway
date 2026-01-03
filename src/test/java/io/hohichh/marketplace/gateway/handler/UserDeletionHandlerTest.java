@@ -73,7 +73,7 @@ class UserDeletionHandlerTest {
     }
 
     @Test
-    void handle_UserServiceFlaky_ShouldRetryAndSucceed() throws InterruptedException {
+    void handle_UserServiceFlaky_ShouldRetryAndSucceed() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
