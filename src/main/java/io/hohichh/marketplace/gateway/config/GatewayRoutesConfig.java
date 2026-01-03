@@ -3,6 +3,7 @@ package io.hohichh.marketplace.gateway.config;
 import io.hohichh.marketplace.gateway.handler.UserDeletionHandler;
 import io.hohichh.marketplace.gateway.handler.UserRegistrationHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,8 @@ public class GatewayRoutesConfig {
     private final UserRegistrationHandler register;
     private final UserDeletionHandler deletion;
 
-    private static final String SWAGGER_PATH = "/api/v3/api-docs";
+    @Value("${marketplace.swagger-path:/api/v3/api-docs}")
+    private String swaggerPath;
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
@@ -26,17 +28,17 @@ public class GatewayRoutesConfig {
                 //docs swagger ui
                 .route("auth-docs", r -> r
                         .path("/v3/api-docs/auth")
-                        .filters(f -> f.rewritePath("/v3/api-docs/auth", SWAGGER_PATH))
+                        .filters(f -> f.rewritePath("/v3/api-docs/auth", swaggerPath))
                         .uri(urlConfig.getAuth())
                 )
                 .route("user-docs", r -> r
                         .path("/v3/api-docs/user")
-                        .filters(f -> f.rewritePath("/v3/api-docs/user", SWAGGER_PATH))
+                        .filters(f -> f.rewritePath("/v3/api-docs/user", swaggerPath))
                         .uri(urlConfig.getUser())
                 )
                 .route("order-docs", r -> r
                         .path("/v3/api-docs/order")
-                        .filters(f -> f.rewritePath("/v3/api-docs/order", SWAGGER_PATH))
+                        .filters(f -> f.rewritePath("/v3/api-docs/order", swaggerPath))
                         .uri(urlConfig.getOrder())
                 )
 
