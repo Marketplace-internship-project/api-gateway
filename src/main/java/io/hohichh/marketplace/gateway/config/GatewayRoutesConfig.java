@@ -41,6 +41,11 @@ public class GatewayRoutesConfig {
                         .filters(f -> f.rewritePath("/v3/api-docs/order", swaggerPath))
                         .uri(urlConfig.getOrder())
                 )
+                .route("payment-docs", r -> r
+                        .path("/v3/api-docs/payment")
+                        .filters(f -> f.rewritePath("/v3/api-docs/payment", swaggerPath))
+                        .uri(urlConfig.getPayment())
+                )
 
                 //registration required saving of user data and receiving user_id from user-service
                 //and saving user_id and credentials in auth-service
