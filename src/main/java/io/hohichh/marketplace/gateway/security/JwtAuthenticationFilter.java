@@ -1,6 +1,7 @@
 package io.hohichh.marketplace.gateway.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -41,7 +42,10 @@ public class JwtAuthenticationFilter implements WebFilter {
                 Authentication auth = getAuthentication(role, userId);
                 return chain.filter(exchange)
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
-            } catch (Exception e){
+            } catch(JwtException e){
+                log.warn("Invalid JWT token processed: {}", e.getMessage());
+            }
+            catch (Exception e){
                 log.error("Cannot set user authentication: {}", e.getMessage());
             }
         }
