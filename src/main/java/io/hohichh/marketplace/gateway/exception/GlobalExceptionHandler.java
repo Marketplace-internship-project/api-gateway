@@ -3,45 +3,51 @@ package io.hohichh.marketplace.gateway.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ServerWebExchange;
+
+import java.net.ConnectException;
+import java.time.Instant;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    public record ErrorResponse(String message){
-    }
-
     @ExceptionHandler(ResourceNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleResourceNotFound(ResourceNotFoundException e) {
-        log.error("ResourceNotFoundException occurred", e);
-        return new ErrorResponse(e.getMessage());
+    public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException ex) {
+        log.error("Resource not found: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setTitle("Resource Not Found");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
     }
 
     @ExceptionHandler(ActionNotPermittedException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleActionNotPermitted(ActionNotPermittedException e) {
-        log.warn("Business logic violation: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+    public ProblemDetail handleActionNotPermittedException(ActionNotPermittedException ex) {
+        log.warn("Action not permitted: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problemDetail.setTitle("Action Not Permitted");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleAccessDenied(AccessDeniedException e) {
-        log.warn("Access denied: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+    @ExceptionHandler(ConnectException.class)
+    public ProblemDetail handleConnectException(ConnectException ex) {
+        log.error("Cannot connect to downstream service: {}", ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, "Service is currently unavailable. Please try again later.");
+        problemDetail.setTitle("Service Unavailable");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleGenericException(Exception ex) {
-
-        log.error("Unhandled exception occurred: ", ex);
-
-        return new ErrorResponse("An unexpected internal server error occurred.");
+    public ProblemDetail handleGlobalException(Exception ex, ServerWebExchange exchange) {
+        log.error("Internal Gateway Error on path {}: {}", exchange.getRequest().getPath(), ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Gateway Error");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
     }
 }
