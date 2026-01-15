@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigSource()))
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/v1/auth/**").permitAll()
+                        .pathMatchers("/api/v1/auth/**", "/api/v1/registration/users").permitAll()
                         .pathMatchers("/api/actuator/**", "/actuator/**").permitAll()
                         .pathMatchers(
                                 "/swagger-ui.html",
