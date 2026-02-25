@@ -1,5 +1,9 @@
 package io.hohichh.marketplace.gateway.config;
 
+import org.springframework.http.HttpMethod;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.hohichh.marketplace.gateway.security.JwtAuthenticationFilter;
@@ -40,6 +44,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigSource()))
                 .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .pathMatchers("/api/v1/auth/**", "/api/v1/registration/users").permitAll()
                         .pathMatchers("/api/actuator/**", "/actuator/**").permitAll()
                         .pathMatchers(
@@ -100,11 +105,18 @@ public class SecurityConfig {
         }
     }
 
+
+    @Bean
     public CorsConfigurationSource corsConfigSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+
+
+        configuration.setAllowedOriginPatterns(List.of("*"));
+
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
+
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
