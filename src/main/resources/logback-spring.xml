@@ -5,7 +5,7 @@
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%15.15t] %cyan(%-40.40logger{39}) : %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [${spring.application.name:-},traceId=%X{traceId:-},spanId=%X{spanId:-}] --- [%15.15t] %cyan(%-40.40logger{39}) : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -49,11 +49,11 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="io.hohichh.marketplace.user.controller" level="DEBUG" additivity="false">
+        <logger name="io.hohichh.marketplace.gateway.controller" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE-CONTROLLERS" />
         </logger>
-        <logger name="io.hohichh.marketplace.user.service" level="DEBUG" additivity="false">
+        <logger name="io.hohichh.marketplace.gateway.service" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE-SERVICES" />
         </logger>
@@ -72,11 +72,11 @@
     </springProfile>
 
     <springProfile name="prod, docker">
-        <logger name="io.hohichh.marketplace.user.controller" level="INFO" additivity="false">
+        <logger name="io.hohichh.marketplace.gateway.controller" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE-CONTROLLERS" />
         </logger>
-        <logger name="io.hohichh.marketplace.user.service" level="INFO" additivity="false">
+        <logger name="io.hohichh.marketplace.gateway.service" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE-SERVICES" />
         </logger>
@@ -92,7 +92,7 @@
     </springProfile>
 
     <springProfile name="test">
-        <logger name="io.hohichh.marketplace.user" level="INFO" additivity="false">
+        <logger name="io.hohichh.marketplace.gateway" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE" />
         </logger>
         <logger name="org.hibernate.SQL" level="WARN" additivity="false">
